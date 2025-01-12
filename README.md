@@ -111,4 +111,10 @@ full_date
 day, month, year, quarter, week, timestamp
 
 
+Dimenzná tabuľka: dim_time
+Kľúč:
+id
+
+Atribúty:
+hour, timestamp, ampm
 
