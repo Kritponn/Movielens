@@ -248,3 +248,32 @@ Obsahuje údaje o filmoch, ako sú názov a rok vydania.
 Faktová tabuľka fact_ratings:
 Obsahuje všetky hodnotenia s odkazmi na dimenzie.
 
+
+Vizualizácia dát 5 grafov:
+
+![alt text](image-2.png)
+
+1. Počet hodnotení podľa času (hodina dňa)
+Čo zobrazuje: Stĺpcový graf zobrazujúci počet hodnotení filmov pre každú hodinu dňa (0–23).
+Otázka: „Kedy počas dňa sú používatelia najaktívnejší v hodnotení filmov?“
+Pomáha identifikovať časové úseky s najvyššou a najnižšou aktivitou používateľov.
+
+2. Priemerné hodnotenie podľa žánru
+Čo zobrazuje: Stĺpcový alebo bodový graf, ktorý ukazuje priemerné hodnotenia pre jednotlivé žánre (napr. akčné, komédie, drámy...).
+Otázka: „Ktoré žánre majú v priemere najvyššie hodnotenia a ktoré najnižšie?“
+Interpretácia: Pomáha zistiť preferencie používateľov pre rôzne žánre a identifikovať obľúbené či menej populárne kategórie.
+
+3. Vývoj počtu hodnotení v čase (po mesiacoch alebo rokoch)
+Čo zobrazuje: Čiarový graf ukazujúci počet hodnotení v priebehu času (mesiac/rok).
+Otázka: „Ako sa menil počet hodnotení naprieč časom? Kedy dosiahli maximum?“
+Interpretácia: Poskytuje prehľad o trendoch v hodnoteniach, vrátane sezónnych či dlhodobých zmien v aktivite používateľov.
+
+4. Priemerné hodnotenie podľa vekovej skupiny používateľa
+Čo zobrazuje: Zoskupený stĺpcový graf zobrazujúci priemerné hodnotenie pre jednotlivé vekové skupiny (napr. <18, 18–24, 25–34...).
+Otázka: „Existujú výrazné rozdiely v priemernom hodnotení u rôznych vekových skupín?“
+Interpretácia: Pomáha analyzovať, ako vek ovplyvňuje hodnotenie filmov a či niektoré skupiny hodnotia prísnejšie alebo miernejšie.
+
+5. Najobľúbenejšie filmy (top 10) podľa priemernej známky
+Čo zobrazuje: Stĺpcový alebo horizontálny barový graf, ktorý ukazuje 10 filmov s najvyšším priemerným hodnotením.
+Otázka: „Ktoré filmy sú hodnotené najlepšie v rámci celej databázy?“
+Interpretácia: Identifikuje najlepšie hodnotené filmy, ktoré môžu byť považované za najobľúbenejšie alebo najkvalitnejšie podľa používateľov.
