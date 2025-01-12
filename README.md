@@ -118,3 +118,14 @@ id
 Atribúty:
 hour, timestamp, ampm
 
+ETL proces v nástroji Snowflake
+
+Extrakcia:
+
+Načítanie zdrojových súborov (CSV predtým importovane do myphpadmin a nasledne exportovane) z MovieLens do staging zóny v Snowflake.
+Hlavný SQL príkaz(príklad): COPY INTO movies (id, title, release_year)
+FROM @MOVIELENS_MOVIELENS/movies.csv
+FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
+SELECT * FROM movies LIMIT 10; -- na testovanie či príkaz prebehol správne a načítalo údaje
+Účel: zabezpečiť, aby dáta boli fyzicky “nahrané” do Snowflake.
+
