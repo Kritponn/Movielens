@@ -276,3 +276,5 @@ Interpretácia: Pomáha analyzovať, ako vek ovplyvňuje hodnotenie filmov a či
 Čo zobrazuje: Stĺpcový alebo horizontálny barový graf, ktorý ukazuje 10 filmov s najvyšším priemerným hodnotením.
 Otázka: „Ktoré filmy sú hodnotené najlepšie v rámci celej databázy?“
 Interpretácia: Identifikuje najlepšie hodnotené filmy, ktoré môžu byť považované za najobľúbenejšie alebo najkvalitnejšie podľa používateľov.
+
+Martin Riziky
