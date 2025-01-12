@@ -79,3 +79,15 @@ rating – hodnotenie od 0,5 do 5 (napr. “hviezdičky”).
 
 Účel:
 Umožňuje analyzovať, ako sa ratingy menia podľa používateľa, filmu, času, dňa v týždni a ďalších atribútov z dimenzií.
+
+Dimenzná tabuľka: dim_users
+Kľúč:
+id 
+
+Atribúty:
+age_group
+gender
+occupation
+zip_code
+
+
