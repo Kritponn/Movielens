@@ -129,3 +129,122 @@ FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
 SELECT * FROM movies LIMIT 10; -- na testovanie či príkaz prebehol správne a načítalo údaje
 Účel: zabezpečiť, aby dáta boli fyzicky “nahrané” do Snowflake.
 
+
+
+Transfor (Transformácia dát)
+Vytvorenie dimenzných tabuliek
+Dimenzia dim_users
+Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
+
+CREATE TABLE dim_users AS
+SELECT DISTINCT
+    u.id AS dim_user_id,
+    CASE 
+        WHEN u.age < 18 THEN 'Under 18'
+        WHEN u.age BETWEEN 18 AND 24 THEN '18-24'
+        WHEN u.age BETWEEN 25 AND 34 THEN '25-34'
+        WHEN u.age BETWEEN 35 AND 44 THEN '35-44'
+        WHEN u.age BETWEEN 45 AND 54 THEN '45-54'
+        WHEN u.age >= 55 THEN '55+'
+        ELSE 'Unknown'
+    END AS age_group,
+    u.gender,
+    o.name AS occupation
+FROM users u
+LEFT JOIN occupations o ON u.occupation_id = o.id;
+
+
+Na základe poskytnutého príkladu a tvojich požiadaviek som pripravil SQL príkazy na transformáciu dát pre tvoju tému filmov (MovieLens):
+
+Transformácia dát
+Vytvorenie dimenzných tabuliek
+Dimenzia dim_users
+Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
+
+
+CREATE TABLE dim_users AS
+SELECT DISTINCT
+    u.id AS dim_user_id,
+    CASE 
+        WHEN u.age < 18 THEN 'Under 18'
+        WHEN u.age BETWEEN 18 AND 24 THEN '18-24'
+        WHEN u.age BETWEEN 25 AND 34 THEN '25-34'
+        WHEN u.age BETWEEN 35 AND 44 THEN '35-44'
+        WHEN u.age BETWEEN 45 AND 54 THEN '45-54'
+        WHEN u.age >= 55 THEN '55+'
+        ELSE 'Unknown'
+    END AS age_group,
+    u.gender,
+    o.name AS occupation
+FROM users u
+LEFT JOIN occupations o ON u.occupation_id = o.id;
+
+Dimenzia dim_movies
+Transformácia údajov o filmoch:
+
+CREATE TABLE dim_movies AS
+SELECT DISTINCT
+    m.id AS dim_movie_id,
+    m.title,
+    m.release_year
+FROM movies m;
+Dimenzia dim_genres
+Žánre sú už pripravené. Môžeš ich skontrolovať:
+
+
+SELECT * FROM genres;
+Dimenzia dim_age_group
+Transformácia kategórií veku (ak je potrebné):
+
+
+CREATE TABLE dim_age_group AS
+SELECT 
+    id AS dim_age_group_id,
+    name AS age_group
+FROM age_group;
+Dimenzia dim_occupations
+Transformácia zamestnaní:
+
+
+CREATE TABLE dim_occupations AS
+SELECT 
+    id AS dim_occupation_id,
+    name AS occupation
+FROM occupations;
+
+Vytvorenie faktovej tabuľky fact_ratings
+Transformácia faktov o hodnoteniach, ktoré obsahujú odkazy na dimenzné tabuľky:
+
+sql
+Kopírovať kód
+CREATE TABLE fact_ratings AS
+SELECT 
+    r.id AS fact_rating_id,
+    r.rating,
+    r.rated_at AS timestamp,
+    u.dim_user_id AS user_id,
+    m.dim_movie_id AS movie_id
+FROM ratings r
+JOIN dim_users u ON r.user_id = u.dim_user_id
+JOIN dim_movies m ON r.movie_id = m.dim_movie_id;
+
+Načítanie a čistenie staging tabuliek
+Odstránenie staging tabuliek po načítaní dát:
+
+DROP TABLE IF EXISTS age_group;
+DROP TABLE IF EXISTS genres;
+DROP TABLE IF EXISTS genres_movies;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS occupations;
+DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS users;
+
+Popis transformácie
+Dimenzia dim_users:
+Zahŕňa používateľov s kategorizovanými vekovými skupinami a zamestnaniami.
+Dimenzia dim_movies:
+Obsahuje údaje o filmoch, ako sú názov a rok vydania.
+Faktová tabuľka fact_ratings:
+Obsahuje všetky hodnotenia s odkazmi na dimenzie.
+
