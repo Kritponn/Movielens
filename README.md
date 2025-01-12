@@ -2,16 +2,16 @@
 School project
 
 
-Krátke vysvetlenie témy projektu MovieLens, typ dát a účel analýzy:
+1. Krátke vysvetlenie témy projektu MovieLens, typ dát a účel analýzy:
 Projekt MovieLens predstavuje rozsiahlu databázu filmových hodnotení vytvorených používateľmi. Obsahuje dáta o filmoch, používateľoch a ich hodnoteniach (ratings), prípadne aj tagy, či časové údaje o hodnoteniach. Tieto údaje sú typicky využívané na tvorbu odporúčacích systémov (recommendation systems), analýzy preferencií používateľov, skúmanie popularít žánrov, filmov a pod.
 
-Typ dát:
+1.1 Typ dát:
 Hlavne textové atribúty (názvy filmov, žánre, mená používateľov a ich charakteristiky), číselné (hodnotenia, ID, roky, dátumy), dátovo-časové (čas/ dátum hodnotenia).
 Účel analýzy: cieľom je získať prehľad o tom, aké filmy sa najviac hodnotia, aké žánre sú obľúbené, akí používatelia ich hodnotia, v akom čase prebieha najviac hodnotení či ako sa hodnotenia menia naprieč demografickými ukazovateľmi.
 
 
 
-Základný popis každej tabuľky zo zdrojových dát a ich význam:
+2. Základný popis každej tabuľky zo zdrojových dát a ich význam:
 
 Movies 
 Hlavné stĺpce: movieId, title, genres
@@ -33,7 +33,7 @@ Time/Date
 Vo väčšine datasetov MovieLens čas nie je v samostatnej tabuľke, ale je uložený v stĺpci timestamp. Pri potrebe detailných analýz (napr. dňa v týždni, času počas dňa) sa zvyčajne extrahuje do samostatnej tabuľky.
 (Názvy tabuliek sa môžu mierne líšiť podľa konkrétnej verzie datasetu, ale princíp ostáva rovnaký.)
 
-ERD diagram pôvodnej štruktúry zdrojových dát
+3. ERD diagram pôvodnej štruktúry zdrojových dát
 
 Nižšie je príklad jednoduchej schémy vzťahov (pôvodná štruktúra MovieLens datasetu). Vzťahy sú:
 
@@ -59,11 +59,11 @@ dim_movies
 dim_date 
 dim_tags 
 
-ERD dimenzionálneho modelu (Hviezdička):
+3.1 ERD dimenzionálneho modelu (Hviezdička):
 ![alt text](image-1.png)
 
 
-Popis tabuliek v dimenzionálnom modeli
+3.2Popis tabuliek v dimenzionálnom modeli
 
 Faktová tabuľka: fact_ratings
 
@@ -118,7 +118,7 @@ id
 Atribúty:
 hour, timestamp, ampm
 
-ETL proces v nástroji Snowflake
+4. ETL proces v nástroji Snowflake
 
 Extrakcia:
 
@@ -131,7 +131,7 @@ SELECT * FROM movies LIMIT 10; -- na testovanie či príkaz prebehol správne a 
 
 
 
-Transfor (Transformácia dát)
+5. Transfor (Transformácia dát)
 Vytvorenie dimenzných tabuliek
 Dimenzia dim_users
 Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
@@ -154,12 +154,12 @@ FROM users u
 LEFT JOIN occupations o ON u.occupation_id = o.id;
 
 
-Na základe poskytnutého príkladu a tvojich požiadaviek som pripravil SQL príkazy na transformáciu dát pre tvoju tému filmov (MovieLens):
 
 Transformácia dát
 Vytvorenie dimenzných tabuliek
 Dimenzia dim_users
-Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
+
+5.1 Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
 
 
 CREATE TABLE dim_users AS
@@ -215,8 +215,7 @@ FROM occupations;
 Vytvorenie faktovej tabuľky fact_ratings
 Transformácia faktov o hodnoteniach, ktoré obsahujú odkazy na dimenzné tabuľky:
 
-sql
-Kopírovať kód
+
 CREATE TABLE fact_ratings AS
 SELECT 
     r.id AS fact_rating_id,
@@ -228,7 +227,7 @@ FROM ratings r
 JOIN dim_users u ON r.user_id = u.dim_user_id
 JOIN dim_movies m ON r.movie_id = m.dim_movie_id;
 
-Načítanie a čistenie staging tabuliek
+5.2 Načítanie a čistenie staging tabuliek
 Odstránenie staging tabuliek po načítaní dát:
 
 DROP TABLE IF EXISTS age_group;
@@ -249,7 +248,7 @@ Faktová tabuľka fact_ratings:
 Obsahuje všetky hodnotenia s odkazmi na dimenzie.
 
 
-Vizualizácia dát 5 grafov:
+6. Vizualizácia dát 5 grafov:
 
 ![alt text](image-2.png)
 
