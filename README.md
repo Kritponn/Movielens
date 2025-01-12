@@ -91,3 +91,14 @@ occupation
 zip_code
 
 
+Dimenzná tabuľka: dim_movies
+Kľúč:
+id
+
+Atribúty:
+title
+release_year
+genres
+
+
+
