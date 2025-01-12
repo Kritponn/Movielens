@@ -89,6 +89,7 @@ age_group
 gender
 occupation
 zip_code
+usercol
 
 
 Dimenzná tabuľka: dim_movies
@@ -99,6 +100,15 @@ Atribúty:
 title
 release_year
 genres
+
+
+Dimenzná tabuľka: dim_date
+Kľúč:
+id
+
+Atribúty:
+full_date
+day, month, year, quarter, week, timestamp
 
 
 
