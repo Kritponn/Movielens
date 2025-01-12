@@ -61,3 +61,21 @@ dim_tags
 
 ERD dimenzionálneho modelu (Hviezdička):
 ![alt text](image-1.png)
+
+
+Popis tabuliek v dimenzionálnom modeli
+
+Faktová tabuľka: fact_ratings
+
+Kľúče:
+id (primárny kľúč faktu)
+user_id (cudzie kľúče do dim_users)
+movie_id (cudzie kľúče do dim_movies)
+date_id (cudzie kľúče do dim_date)
+time_id (cudzie kľúče do dim_time)
+
+Hlavné metriky:
+rating – hodnotenie od 0,5 do 5 (napr. “hviezdičky”).
+
+Účel:
+Umožňuje analyzovať, ako sa ratingy menia podľa používateľa, filmu, času, dňa v týždni a ďalších atribútov z dimenzií.
