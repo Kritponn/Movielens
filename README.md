@@ -43,3 +43,21 @@ Tags je obdobne prepojovacia tabuľka medzi Users a Movies (1 používateľ mô�
 ![alt text](image.png)
 
 Prípadne, ak existuje samostatná tabuľka Time/Date, tak Ratings a Tags budú mať cudzie kľúče na túto tabuľku.
+
+
+
+Návrh dimenzionálneho modelu typu hviezda (Hviezdička)
+
+V dimenzionálnom modeli zvyčajne zoskupíme číselné a merateľné údaje do jednej faktovej tabuľky a opisné údaje do dimenzných tabuliek.
+
+Faktová tabuľka:
+fact_ratings (obsahuje všetky merateľné údaje: rating, počet hodnotení, dátum hodnotenia, a kľúče na dimenzie)
+
+Dimenzie:
+dim_users 
+dim_movies 
+dim_date 
+dim_tags 
+
+ERD dimenzionálneho modelu (Hviezdička):
+![alt text](image-1.png)
