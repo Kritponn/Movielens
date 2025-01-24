@@ -1,141 +1,87 @@
 # Movielens
-School project
 
+Tento projekt je zameraný na analýzu filmových hodnotení z datasetu MovieLens. Obsahuje podrobný popis zdrojových dát, dimenzionálneho modelu a postup ETL procesu v Snowflake.
 
-1. Krátke vysvetlenie témy projektu MovieLens, typ dát a účel analýzy:
-Projekt MovieLens predstavuje rozsiahlu databázu filmových hodnotení vytvorených používateľmi. Obsahuje dáta o filmoch, používateľoch a ich hodnoteniach (ratings), prípadne aj tagy, či časové údaje o hodnoteniach. Tieto údaje sú typicky využívané na tvorbu odporúčacích systémov (recommendation systems), analýzy preferencií používateľov, skúmanie popularít žánrov, filmov a pod.
+---
 
-1.1 Typ dát:
-Hlavne textové atribúty (názvy filmov, žánre, mená používateľov a ich charakteristiky), číselné (hodnotenia, ID, roky, dátumy), dátovo-časové (čas/ dátum hodnotenia).
-Účel analýzy: cieľom je získať prehľad o tom, aké filmy sa najviac hodnotia, aké žánre sú obľúbené, akí používatelia ich hodnotia, v akom čase prebieha najviac hodnotení či ako sa hodnotenia menia naprieč demografickými ukazovateľmi.
+## 1. Úvod a popis projektu
 
+### 1.1 Téma projektu
+Projekt MovieLens predstavuje rozsiahlu databázu filmových hodnotení vytvorených používateľmi. Obsahuje dáta o filmoch, používateľoch, ich hodnoteniach (ratings) a tagoch.
 
+### 1.2 Účel analýzy
+Cieľom je analyzovať:
+- Ktoré filmy sú najviac hodnotené.
+- Obľúbenosť žánrov.
+- Aktivity používateľov v čase.
+- Ako sa hodnotenia líšia medzi rôznymi skupinami ľudí.
 
-2. Základný popis každej tabuľky zo zdrojových dát a ich význam:
+---
 
-Movies 
-Hlavné stĺpce: movieId, title, genres
-Význam: Zahŕňa informácie o filmoch, ich názvy a žánre. Pre analýzy môžeme filmovú entitu spájať s konkrétnymi hodnoteniami.
+## 2. Základný popis zdrojových tabuliek
 
-Ratings
-Hlavné stĺpce: userId, movieId, rating, timestamp
-Význam: Zaznamenávajú hodnotenia filmov jednotlivými používateľmi na škále od 0,5 po 5 (podľa verzie datasetu). timestamp predstavuje čas vytvorenia hodnotenia.
+- **Movies**
+  - **Hlavné stĺpce**: `movieId`, `title`, `genres`
+  - **Význam**: Obsahuje informácie o filmoch, ich názvy a žánre.
 
-Tags
-Hlavné stĺpce: userId, movieId, tag, timestamp
-Význam: Umožňujú používateľom priraďovať k filmom tagy (krátke textové popisy, napr. “thriller”, “based on a true story”), ktoré vystihujú film z pohľadu používateľa.
+- **Ratings**
+  - **Hlavné stĺpce**: `userId`, `movieId`, `rating`, `timestamp`
+  - **Význam**: Uchováva hodnotenia filmov používateľmi na škále 0,5 až 5.
 
-Users
-Hlavné stĺpce: userId, prípadne demografické informácie (pohlavie, veková skupina, povolanie, PSČ a pod.) – to závisí od verzie datasetu.
-Význam: Obsahuje informácie o demografii a iných atribútoch používateľov, na základe ktorých môžeme analyzovať rozdiely v preferenciách.
+- **Tags**
+  - **Hlavné stĺpce**: `userId`, `movieId`, `tag`, `timestamp`
+  - **Význam**: Obsahuje textové popisy filmov od používateľov.
 
-Time/Date
-Vo väčšine datasetov MovieLens čas nie je v samostatnej tabuľke, ale je uložený v stĺpci timestamp. Pri potrebe detailných analýz (napr. dňa v týždni, času počas dňa) sa zvyčajne extrahuje do samostatnej tabuľky.
-(Názvy tabuliek sa môžu mierne líšiť podľa konkrétnej verzie datasetu, ale princíp ostáva rovnaký.)
+- **Users**
+  - **Hlavné stĺpce**: `userId`, demografické informácie (vek, pohlavie, povolanie).
+  - **Význam**: Informácie o používateľoch, ktoré umožňujú analýzu rozdielov v preferenciách.
 
-3. ERD diagram pôvodnej štruktúry zdrojových dát
+---
 
-Nižšie je príklad jednoduchej schémy vzťahov (pôvodná štruktúra MovieLens datasetu). Vzťahy sú:
+## 3. Dátová architektúra
 
-Ratings je prepojovacia tabuľka medzi Users a Movies (1 používateľ môže ohodnotiť viac filmov, 1 film môže byť ohodnotený viacerými používateľmi).
-Tags je obdobne prepojovacia tabuľka medzi Users a Movies (1 používateľ môže pridávať tagy k viacerým filmom a 1 film môže mať viacero tagov).
+### 3.1 ERD diagram zdrojových dát
+Pôvodná štruktúra datasetu zahŕňa nasledujúce vzťahy:
 
-![alt text](image.png)
+- **Ratings** je prepojovacia tabuľka medzi **Users** a **Movies**.
+- **Tags** obdobne prepája **Users** a **Movies**.
 
-Prípadne, ak existuje samostatná tabuľka Time/Date, tak Ratings a Tags budú mať cudzie kľúče na túto tabuľku.
+![ERD pôvodný diagram](image.png)
 
+---
 
+## 4. Dimenzionálny model
 
-Návrh dimenzionálneho modelu typu hviezda (Hviezdička)
+Navrhnutý hviezdicový model zahŕňa dve faktové tabuľku a viaceré dimenzie.V tomto prípade sa hviezdicový model len rozšíri o dalšiu faktovu tabuľku("galaxy model").
 
-V dimenzionálnom modeli zvyčajne zoskupíme číselné a merateľné údaje do jednej faktovej tabuľky a opisné údaje do dimenzných tabuliek.
+### 4.1 Faktová tabuľka
+- **fact_ratings**:
+  - Kľúče: `id`, `user_id`, `movie_id`, `date_id`, `time_id`
+  - Metodiky: `rating` (hodnotenie od 0,5 do 5)
 
-Faktová tabuľka:
-fact_ratings (obsahuje všetky merateľné údaje: rating, počet hodnotení, dátum hodnotenia, a kľúče na dimenzie)
+### 4.2 Dimenzie
+- **dim_users**: Informácie o používateľoch (vek, pohlavie, povolanie).
+- **dim_movies**: Informácie o filmoch (názov, rok vydania, žánre).
+- **dim_date**: Dátum hodnotenia (deň, mesiac, rok, štvrťrok).
+- **dim_time**: Podrobné časové údaje (hodina, AM/PM).
 
-Dimenzie:
-dim_users 
-dim_movies 
-dim_date 
-dim_tags 
+![Hviezdicový model](image-1.png)
 
-3.1 ERD dimenzionálneho modelu (Hviezdička):
-![alt text](image-1.png)
+---
 
+## 5. ETL proces v Snowflake
 
-3.2Popis tabuliek v dimenzionálnom modeli
-
-Faktová tabuľka: fact_ratings
-
-Kľúče:
-id (primárny kľúč faktu)
-user_id (cudzie kľúče do dim_users)
-movie_id (cudzie kľúče do dim_movies)
-date_id (cudzie kľúče do dim_date)
-time_id (cudzie kľúče do dim_time)
-
-Hlavné metriky:
-rating – hodnotenie od 0,5 do 5 (napr. “hviezdičky”).
-
-Účel:
-Umožňuje analyzovať, ako sa ratingy menia podľa používateľa, filmu, času, dňa v týždni a ďalších atribútov z dimenzií.
-
-Dimenzná tabuľka: dim_users
-Kľúč:
-id 
-
-Atribúty:
-age_group
-gender
-occupation
-zip_code
-usercol
-
-
-Dimenzná tabuľka: dim_movies
-Kľúč:
-id
-
-Atribúty:
-title
-release_year
-genres
-
-
-Dimenzná tabuľka: dim_date
-Kľúč:
-id
-
-Atribúty:
-full_date
-day, month, year, quarter, week, timestamp
-
-
-Dimenzná tabuľka: dim_time
-Kľúč:
-id
-
-Atribúty:
-hour, timestamp, ampm
-
-4. ETL proces v nástroji Snowflake
-
-Extrakcia:
-
-Načítanie zdrojových súborov (CSV predtým importovane do myphpadmin a nasledne exportovane) z MovieLens do staging zóny v Snowflake.
-Hlavný SQL príkaz(príklad): COPY INTO movies (id, title, release_year)
+### 5.1 Extrakcia dát
+Dáta sa importujú zo zdrojových CSV súborov (získane, extrahované do CSV pomocou PhpMyAdmin) do staging zóny pomocou príkladného príkazu:
+```sql
+COPY INTO movies (id, title, release_year)
 FROM @MOVIELENS_MOVIELENS/movies.csv
 FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1);
-SELECT * FROM movies LIMIT 10; -- na testovanie či príkaz prebehol správne a načítalo údaje
-Účel: zabezpečiť, aby dáta boli fyzicky “nahrané” do Snowflake.
+```
 
-
-
-5. Transfor (Transformácia dát)
-Vytvorenie dimenzných tabuliek
-Dimenzia dim_users
-Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
-
+### 5.2 Transformácia dát
+Príklad vytvorenia dimenzie **dim_users**:
+```sql
 CREATE TABLE dim_users AS
 SELECT DISTINCT
     u.id AS dim_user_id,
@@ -152,70 +98,11 @@ SELECT DISTINCT
     o.name AS occupation
 FROM users u
 LEFT JOIN occupations o ON u.occupation_id = o.id;
+```
 
-
-
-Transformácia dát
-Vytvorenie dimenzných tabuliek
-Dimenzia dim_users
-
-5.1 Transformácia používateľov, rozdelenie veku do kategórií a obohatenie údajov:
-
-
-CREATE TABLE dim_users AS
-SELECT DISTINCT
-    u.id AS dim_user_id,
-    CASE 
-        WHEN u.age < 18 THEN 'Under 18'
-        WHEN u.age BETWEEN 18 AND 24 THEN '18-24'
-        WHEN u.age BETWEEN 25 AND 34 THEN '25-34'
-        WHEN u.age BETWEEN 35 AND 44 THEN '35-44'
-        WHEN u.age BETWEEN 45 AND 54 THEN '45-54'
-        WHEN u.age >= 55 THEN '55+'
-        ELSE 'Unknown'
-    END AS age_group,
-    u.gender,
-    o.name AS occupation
-FROM users u
-LEFT JOIN occupations o ON u.occupation_id = o.id;
-
-Dimenzia dim_movies
-Transformácia údajov o filmoch:
-
-CREATE TABLE dim_movies AS
-SELECT DISTINCT
-    m.id AS dim_movie_id,
-    m.title,
-    m.release_year
-FROM movies m;
-Dimenzia dim_genres
-Žánre sú už pripravené. Môžeš ich skontrolovať:
-
-
-SELECT * FROM genres;
-Dimenzia dim_age_group
-Transformácia kategórií veku (ak je potrebné):
-
-
-CREATE TABLE dim_age_group AS
-SELECT 
-    id AS dim_age_group_id,
-    name AS age_group
-FROM age_group;
-Dimenzia dim_occupations
-Transformácia zamestnaní:
-
-
-CREATE TABLE dim_occupations AS
-SELECT 
-    id AS dim_occupation_id,
-    name AS occupation
-FROM occupations;
-
-Vytvorenie faktovej tabuľky fact_ratings
-Transformácia faktov o hodnoteniach, ktoré obsahujú odkazy na dimenzné tabuľky:
-
-
+### 5.3 Načítanie dát
+Transformácia faktovej tabuľky **fact_ratings**:
+```sql
 CREATE TABLE fact_ratings AS
 SELECT 
     r.id AS fact_rating_id,
@@ -226,55 +113,65 @@ SELECT
 FROM ratings r
 JOIN dim_users u ON r.user_id = u.dim_user_id
 JOIN dim_movies m ON r.movie_id = m.dim_movie_id;
+```
 
-5.2 Načítanie a čistenie staging tabuliek
-Odstránenie staging tabuliek po načítaní dát:
+---
 
-DROP TABLE IF EXISTS age_group;
-DROP TABLE IF EXISTS genres;
-DROP TABLE IF EXISTS genres_movies;
-DROP TABLE IF EXISTS movies;
-DROP TABLE IF EXISTS occupations;
-DROP TABLE IF EXISTS ratings;
-DROP TABLE IF EXISTS tags;
-DROP TABLE IF EXISTS users;
+## 6. Vizualizácia dát
 
-Popis transformácie
-Dimenzia dim_users:
-Zahŕňa používateľov s kategorizovanými vekovými skupinami a zamestnaniami.
-Dimenzia dim_movies:
-Obsahuje údaje o filmoch, ako sú názov a rok vydania.
-Faktová tabuľka fact_ratings:
-Obsahuje všetky hodnotenia s odkazmi na dimenzie.
+### 6.1 Grafy
 
+1. **Počet hodnotení podľa hodín dňa**
+   - *Otázka*: Kedy sú používatelia najaktívnejší?
+   - SELECT 
+    DATE_PART('hour', rated_at) AS hour_of_day,
+    COUNT(*) AS total_ratings
+FROM fact_ratings
+GROUP BY hour_of_day
+ORDER BY hour_of_day;
 
-6. Vizualizácia dát 5 grafov:
+2. **Priemerné hodnotenie podľa žánru**
+   - *Otázka*: Ktoré žánre sú najobľúbenejšie?
+   - SELECT 
+    g.name AS genre_name,
+    ROUND(AVG(r.rating), 2) AS avg_rating
+FROM fact_ratings r
+JOIN genres_movies gm ON r.movie_id = gm.movie_id
+JOIN genres g ON gm.genre_id = g.id
+GROUP BY g.name
+ORDER BY avg_rating DESC;
 
-![alt text](image-2.png)
+3. **Hodnotenia v priebehu času**
+   - *Otázka*: Ako sa mení počet hodnotení podľa času?
+   - SELECT 
+    DATE_PART('year', rated_at) AS year,
+    DATE_PART('month', rated_at) AS month,
+    COUNT(*) AS total_ratings
+FROM fact_ratings
+GROUP BY year, month
+ORDER BY year, month;
 
-1. Počet hodnotení podľa času (hodina dňa)
-Čo zobrazuje: Stĺpcový graf zobrazujúci počet hodnotení filmov pre každú hodinu dňa (0–23).
-Otázka: „Kedy počas dňa sú používatelia najaktívnejší v hodnotení filmov?“
-Pomáha identifikovať časové úseky s najvyššou a najnižšou aktivitou používateľov.
+4. **Priemerné hodnotenie podľa vekovej skupiny**
+   - *Otázka*: Ovplyvňuje vek hodnotenie?
+   - SELECT 
+    u.age_group AS age_group,
+    ROUND(AVG(r.rating), 2) AS avg_rating
+FROM fact_ratings r
+JOIN dim_users u ON r.user_id = u.dim_user_id
+GROUP BY u.age_group
+ORDER BY u.age_group;
 
-2. Priemerné hodnotenie podľa žánru
-Čo zobrazuje: Stĺpcový alebo bodový graf, ktorý ukazuje priemerné hodnotenia pre jednotlivé žánre (napr. akčné, komédie, drámy...).
-Otázka: „Ktoré žánre majú v priemere najvyššie hodnotenia a ktoré najnižšie?“
-Interpretácia: Pomáha zistiť preferencie používateľov pre rôzne žánre a identifikovať obľúbené či menej populárne kategórie.
+5. **Top 10 najlepšie hodnotených filmov**
+   - *Otázka*: Ktoré filmy sú najlepšie hodnotené?
+   - SELECT 
+    m.title AS movie_title,
+    ROUND(AVG(r.rating), 2) AS avg_rating
+FROM fact_ratings r
+JOIN dim_movies m ON r.movie_id = m.dim_movie_id
+GROUP BY m.title
+ORDER BY avg_rating DESC
+LIMIT 10;
 
-3. Vývoj počtu hodnotení v čase (po mesiacoch alebo rokoch)
-Čo zobrazuje: Čiarový graf ukazujúci počet hodnotení v priebehu času (mesiac/rok).
-Otázka: „Ako sa menil počet hodnotení naprieč časom? Kedy dosiahli maximum?“
-Interpretácia: Poskytuje prehľad o trendoch v hodnoteniach, vrátane sezónnych či dlhodobých zmien v aktivite používateľov.
+---
 
-4. Priemerné hodnotenie podľa vekovej skupiny používateľa
-Čo zobrazuje: Zoskupený stĺpcový graf zobrazujúci priemerné hodnotenie pre jednotlivé vekové skupiny (napr. <18, 18–24, 25–34...).
-Otázka: „Existujú výrazné rozdiely v priemernom hodnotení u rôznych vekových skupín?“
-Interpretácia: Pomáha analyzovať, ako vek ovplyvňuje hodnotenie filmov a či niektoré skupiny hodnotia prísnejšie alebo miernejšie.
-
-5. Najobľúbenejšie filmy (top 10) podľa priemernej známky
-Čo zobrazuje: Stĺpcový alebo horizontálny barový graf, ktorý ukazuje 10 filmov s najvyšším priemerným hodnotením.
-Otázka: „Ktoré filmy sú hodnotené najlepšie v rámci celej databázy?“
-Interpretácia: Identifikuje najlepšie hodnotené filmy, ktoré môžu byť považované za najobľúbenejšie alebo najkvalitnejšie podľa používateľov.
-
-Martin Riziky
+**Autor:** Martin Riziky
