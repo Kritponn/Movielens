@@ -186,6 +186,7 @@ JOIN dim_movies m ON r.movie_id = m.dim_movie_id;
    ORDER BY avg_rating DESC
    LIMIT 10;
    ```
+   ![Grafy](image-2.png)
 
 
 ---
