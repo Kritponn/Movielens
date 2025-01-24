@@ -123,54 +123,70 @@ JOIN dim_movies m ON r.movie_id = m.dim_movie_id;
 
 1. **Počet hodnotení podľa hodín dňa**
    - *Otázka*: Kedy sú používatelia najaktívnejší?
-   - SELECT 
-    DATE_PART('hour', rated_at) AS hour_of_day,
-    COUNT(*) AS total_ratings
-FROM fact_ratings
-GROUP BY hour_of_day
-ORDER BY hour_of_day;
+   - Tento graf zobrazuje, v ktorých hodinách dňa dochádza k najväčšiemu počtu hodnotení.
+   ```sql
+   SELECT 
+       DATE_PART('hour', rated_at) AS hour_of_day,
+       COUNT(*) AS total_ratings
+   FROM fact_ratings
+   GROUP BY hour_of_day
+   ORDER BY hour_of_day;
+   ```
 
 2. **Priemerné hodnotenie podľa žánru**
    - *Otázka*: Ktoré žánre sú najobľúbenejšie?
-   - SELECT 
-    g.name AS genre_name,
-    ROUND(AVG(r.rating), 2) AS avg_rating
-FROM fact_ratings r
-JOIN genres_movies gm ON r.movie_id = gm.movie_id
-JOIN genres g ON gm.genre_id = g.id
-GROUP BY g.name
-ORDER BY avg_rating DESC;
+   - Tento graf ukazuje priemerné hodnotenie pre jednotlivé žánre a pomáha identifikovať obľúbené kategórie.
+   ```sql
+   SELECT 
+       g.name AS genre_name,
+       ROUND(AVG(r.rating), 2) AS avg_rating
+   FROM fact_ratings r
+   JOIN genres_movies gm ON r.movie_id = gm.movie_id
+   JOIN genres g ON gm.genre_id = g.id
+   GROUP BY g.name
+   ORDER BY avg_rating DESC;
+   ```
 
 3. **Hodnotenia v priebehu času**
    - *Otázka*: Ako sa mení počet hodnotení podľa času?
-   - SELECT 
-    DATE_PART('year', rated_at) AS year,
-    DATE_PART('month', rated_at) AS month,
-    COUNT(*) AS total_ratings
-FROM fact_ratings
-GROUP BY year, month
-ORDER BY year, month;
+   - Tento graf poskytuje pohľad na trendy v hodnoteniach v priebehu rokov a mesiacov.
+   ```sql
+   SELECT 
+       DATE_PART('year', rated_at) AS year,
+       DATE_PART('month', rated_at) AS month,
+       COUNT(*) AS total_ratings
+   FROM fact_ratings
+   GROUP BY year, month
+   ORDER BY year, month;
+   ```
 
 4. **Priemerné hodnotenie podľa vekovej skupiny**
    - *Otázka*: Ovplyvňuje vek hodnotenie?
-   - SELECT 
-    u.age_group AS age_group,
-    ROUND(AVG(r.rating), 2) AS avg_rating
-FROM fact_ratings r
-JOIN dim_users u ON r.user_id = u.dim_user_id
-GROUP BY u.age_group
-ORDER BY u.age_group;
+   - Graf zobrazuje, ako sa priemerné hodnotenie filmov líši medzi vekovými skupinami.
+   ```sql
+   SELECT 
+       u.age_group AS age_group,
+       ROUND(AVG(r.rating), 2) AS avg_rating
+   FROM fact_ratings r
+   JOIN dim_users u ON r.user_id = u.dim_user_id
+   GROUP BY u.age_group
+   ORDER BY u.age_group;
+   ```
 
 5. **Top 10 najlepšie hodnotených filmov**
    - *Otázka*: Ktoré filmy sú najlepšie hodnotené?
-   - SELECT 
-    m.title AS movie_title,
-    ROUND(AVG(r.rating), 2) AS avg_rating
-FROM fact_ratings r
-JOIN dim_movies m ON r.movie_id = m.dim_movie_id
-GROUP BY m.title
-ORDER BY avg_rating DESC
-LIMIT 10;
+   - Tento graf identifikuje filmy s najvyšším priemerným hodnotením a poskytuje zoznam top 10.
+   ```sql
+   SELECT 
+       m.title AS movie_title,
+       ROUND(AVG(r.rating), 2) AS avg_rating
+   FROM fact_ratings r
+   JOIN dim_movies m ON r.movie_id = m.dim_movie_id
+   GROUP BY m.title
+   ORDER BY avg_rating DESC
+   LIMIT 10;
+   ```
+
 
 ---
 
